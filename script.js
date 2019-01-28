@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Jira bug semaphore
 // @namespace    http://tampermonkey.net/
-// @version      0.4
+// @version      0.5
 // @description  Displays bugs count by colors according to priority
 // @author       Manantt
 // @match        http://intranet.jira.es/*
@@ -63,10 +63,20 @@ $.post( tickets['bloqueante']['ruta'], function( data ) {
 function createMenu(numBloqueantes){
     var botones = '<p class="aui-buttons" style="margin:0 50px">';
     $.each(tickets, function(key, value){
-        botones += '<button class="aui-button aui-button-primary" style="margin:0;background-color:'+value['color']+';width:42px;"><a style="padding:0" href='+'\''+value['ruta']+'\''+' title="'+value['title']+'">'+(value['cantidad']>=50?"50+":value['cantidad'])+'</a></button>';
+        botones += '<button class="aui-button aui-button-primary" style="margin:0;padding:0;background-color:'+value['color']+';width:42px;"><a class="link_semaforo" style="padding:8px;'+(key=="bloqueante"?"border-top-left-radius: 3.01px;border-bottom-left-radius: 3.01px;":"")+'" href='+'\''+value['ruta']+'\''+' title="'+value['title']+'">'+(value['cantidad']>=50?"50+":value['cantidad'])+'</a></button>';
     });
     botones += '<button class="aui-button aui-button-primary" style="margin:0"><a style="padding:0" title="Ver bugs sin asignar ordenados por prioridad" href=\'/issues/?jql=project%20%3D%20ACC%20AND%20statusCategory%20in%20("To%20Do"%2C%20"In%20Progress")%20AND%20(assignee%20%3D%20EMPTY%20OR%20assignee%20%3D%20currentUser())%20AND%20type%20%3D%20Error%20ORDER%20BY%20priority%20DESC%2C%20created%20ASC\'>Ver todos</a></button>';
     botones += '</p>';
 
     $("#header nav .aui-header-primary ul").first().append(botones);
+    var css = '.link_semaforo:hover{ background-color: transparent !important; box-shadow: inset 0px 0px 15px 0px rgba(0,0,0,0.55); }.link_semaforo:focus{ background-color: transparent !important; box-shadow: inset 0px 0px 15px 0px rgba(0,0,0,0.65); }';
+    var style = document.createElement('style');
+
+    if (style.styleSheet) {
+        style.styleSheet.cssText = css;
+    } else {
+        style.appendChild(document.createTextNode(css));
+    }
+
+    document.getElementsByTagName('head')[0].appendChild(style);
 }
