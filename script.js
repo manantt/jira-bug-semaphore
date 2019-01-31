@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Jira bug semaphore
 // @namespace    http://tampermonkey.net/
-// @version      0.7
+// @version      0.9
 // @description  Displays bugs count by colors according to priority
 // @author       Manantt
 // @match        http://intranet.jira.es/*
@@ -14,35 +14,35 @@ var tickets = {
         "title":"Bloqueantes",
         "color" : "rgb(206, 0, 0)",
         "borde" : "rgb(133, 0, 0)",
-        "ruta" : 'http://intranet.jira.es/issues/?jql=project%20in%20(NET%2C%20NeT10-Bugs)%20AND%20priority%20in%20(Bloqueante)%20AND%20statusCategory%20in%20(%22To%20Do%22%2C%20%22In%20Progress%22)%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC'
+        "ruta" : 'http://intranet.jira.es/issues/?jql=project%20%3D%20NeT10-Bugs%20AND%20priority%20in%20(Bloqueante)%20AND%20statusCategory%20in%20(%22To%20Do%22%2C%20%22In%20Progress%22)%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC'
     },
     "alta" : {
         "cantidad" : 0,
         "title":"Prioridad alta",
         "color" : "rgb(234, 68, 68)",
         "borde" : "rgb(176, 19, 19)",
-        "ruta" : 'http://intranet.jira.es/issues/?jql=project%20in%20(NET%2C%20NeT10-Bugs)%20AND%20priority%20in%20(Alta)%20AND%20statusCategory%20in%20(%22To%20Do%22%2C%20%22In%20Progress%22)%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC'
+        "ruta" : 'http://intranet.jira.es/issues/?jql=project%20%3D%20NeT10-Bugs%20AND%20priority%20in%20(Alta)%20AND%20statusCategory%20in%20(%22To%20Do%22%2C%20%22In%20Progress%22)%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC'
     },
     "media" : {
         "cantidad" : 0,
         "title":"Prioridad media",
         "color" : "rgb(234, 125, 36)",
         "borde" : "rgb(160, 80, 15)",
-        "ruta" : 'http://intranet.jira.es/issues/?jql=project%20in%20(NET%2C%20NeT10-Bugs)%20AND%20priority%20in%20(Media)%20AND%20statusCategory%20in%20(%22To%20Do%22%2C%20%22In%20Progress%22)%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC'
+        "ruta" : 'http://intranet.jira.es/issues/?jql=project%20%3D%20NeT10-Bugs%20AND%20priority%20in%20(Media)%20AND%20statusCategory%20in%20(%22To%20Do%22%2C%20%22In%20Progress%22)%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC'
     },
     "baja" : {
         "cantidad" : 0,
         "title":"Prioridad baja",
         "color" : "rgb(42, 135, 53)",
         "borde" : "rgb(27, 87, 34)",
-        "ruta" : 'http://intranet.jira.es/issues/?jql=project%20in%20(NET%2C%20NeT10-Bugs)%20AND%20priority%20in%20(Baja)%20AND%20statusCategory%20in%20(%22To%20Do%22%2C%20%22In%20Progress%22)%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC'
+        "ruta" : 'http://intranet.jira.es/issues/?jql=project%20%3D%20NeT10-Bugs%20AND%20priority%20in%20(Baja)%20AND%20statusCategory%20in%20(%22To%20Do%22%2C%20%22In%20Progress%22)%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC'
     },
     "muybaja" : {
         "cantidad" : 0,
         "title":"Prioridad muy baja",
         "color" : "rgb(85, 165, 87)",
         "borde" : "rgb(55, 107, 56)",
-        "ruta" : "http://intranet.jira.es/issues/?jql=project%20in%20(NET%2C%20NeT10-Bugs)%20AND%20priority%20in%20(\'Muy%20baja\')%20AND%20statusCategory%20in%20(%22To%20Do%22%2C%20%22In%20Progress%22)%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC"
+        "ruta" : "http://intranet.jira.es/issues/?jql=project%20%3D%20NeT10-Bugs%20AND%20priority%20in%20(\'Muy%20baja\')%20AND%20statusCategory%20in%20(%22To%20Do%22%2C%20%22In%20Progress%22)%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC"
     },
 };
 (function() {
@@ -50,23 +50,39 @@ var tickets = {
 })();
 
 $.post( tickets['bloqueante']['ruta'], function( data ) {
-    var cantidad = $(data).find("ol.issue-list li").length == "50" ? "50+" : $(data).find("ol.issue-list li").length;
+    var cantidad = data.match(/(total&quot;:)(\d)+(,&quot;)/g)[0].replace("total&quot;:", "").replace(",&quot;", "");
+    if(typeof cantidad == "undefined"){
+        cantidad = $(data).find("ol.issue-list li").length == "50" ? "50+" : $(data).find("ol.issue-list li").length;
+    }
     $(".boton-bloqueante").html(cantidad);
 });
 $.post( tickets['alta']['ruta'], function( data ) {
-    var cantidad = $(data).find("ol.issue-list li").length == "50" ? "50+" : $(data).find("ol.issue-list li").length;
+    var cantidad = data.match(/(total&quot;:)(\d)+(,&quot;)/g)[0].replace("total&quot;:", "").replace(",&quot;", "");
+    if(typeof cantidad == "undefined"){
+        cantidad = $(data).find("ol.issue-list li").length == "50" ? "50+" : $(data).find("ol.issue-list li").length;
+    }
     $(".boton-alta").html(cantidad);
 });
 $.post( tickets['media']['ruta'], function( data ) {
-    var cantidad = $(data).find("ol.issue-list li").length == "50" ? "50+" : $(data).find("ol.issue-list li").length;
+    var cantidad = data.match(/(total&quot;:)(\d)+(,&quot;)/g)[0].replace("total&quot;:", "").replace(",&quot;", "");
+    if(typeof cantidad == "undefined"){
+        cantidad = $(data).find("ol.issue-list li").length == "50" ? "50+" : $(data).find("ol.issue-list li").length;
+    }
     $(".boton-media").html(cantidad);
+    console.error();
 });
 $.post( tickets['baja']['ruta'], function( data ) {
-    var cantidad = $(data).find("ol.issue-list li").length == "50" ? "50+" : $(data).find("ol.issue-list li").length;
+    var cantidad = data.match(/(total&quot;:)(\d)+(,&quot;)/g)[0].replace("total&quot;:", "").replace(",&quot;", "");
+    if(typeof cantidad == "undefined"){
+        cantidad = $(data).find("ol.issue-list li").length == "50" ? "50+" : $(data).find("ol.issue-list li").length;
+    }
     $(".boton-baja").html(cantidad);
 });
 $.post( tickets['muybaja']['ruta'], function( data ) {
-    var cantidad = $(data).find("ol.issue-list li").length == "50" ? "50+" : $(data).find("ol.issue-list li").length;
+    var cantidad = data.match(/(total&quot;:)(\d)+(,&quot;)/g)[0].replace("total&quot;:", "").replace(",&quot;", "");
+    if(typeof cantidad == "undefined"){
+        cantidad = $(data).find("ol.issue-list li").length == "50" ? "50+" : $(data).find("ol.issue-list li").length;
+    }
     $(".boton-muybaja").html(cantidad);
 });
 //
