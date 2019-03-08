@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Jira bug semaphore
 // @namespace    http://tampermonkey.net/
-// @version      0.12
+// @version      0.13
 // @description  Displays bugs count by colors according to priority
 // @author       Manantt
 // @match        http://intranet.jira.es/*
@@ -9,6 +9,20 @@
 // ==/UserScript==
 
 var tickets = {
+    "pruebas" : {
+        "cantidad" : 0,
+        "title":"En pruebas",
+        "color" : "rgb(100, 0, 0)",
+        "borde" : "rgb(25, 0, 0)",
+        "ruta" : 'http://intranet.jira.es/issues/?jql=status%20%3D%20Pruebas%20%20ORDER%20BY%20priority%20DESC%2C%20created%20ASC'
+    },
+    "revision" : {
+        "cantidad" : 0,
+        "title":"En revisión",
+        "color" : "rgb(50, 0, 0)",
+        "borde" : "rgb(25, 0, 0)",
+        "ruta" : 'http://intranet.jira.es/issues/?jql=status%20%3D%20"En%20revision"%20%20ORDER%20BY%20priority%20DESC%2C%20created%20ASC'
+    },
     "bloqueante" : {
         "cantidad" : 0,
         "title":"Bloqueantes",
@@ -47,9 +61,22 @@ var tickets = {
 };
 (function() {
     crearSemaforo();
-    falificar();
 })();
 
+$.post( tickets['pruebas']['ruta'], function( data ) {
+    var cantidad = data.match(/(total&quot;:)(\d)+(,&quot;)/g)[0].replace("total&quot;:", "").replace(",&quot;", "");
+    if(typeof cantidad == "undefined"){
+        cantidad = $(data).find("ol.issue-list li").length == "50" ? "50+" : $(data).find("ol.issue-list li").length;
+    }
+    $(".boton-pruebas").html(cantidad);
+});
+$.post( tickets['revision']['ruta'], function( data ) {
+    var cantidad = data.match(/(total&quot;:)(\d)+(,&quot;)/g)[0].replace("total&quot;:", "").replace(",&quot;", "");
+    if(typeof cantidad == "undefined"){
+        cantidad = $(data).find("ol.issue-list li").length == "50" ? "50+" : $(data).find("ol.issue-list li").length;
+    }
+    $(".boton-revision").html(cantidad);
+});
 $.post( tickets['bloqueante']['ruta'], function( data ) {
     var cantidad = data.match(/(total&quot;:)(\d)+(,&quot;)/g)[0].replace("total&quot;:", "").replace(",&quot;", "");
     if(typeof cantidad == "undefined"){
@@ -94,7 +121,7 @@ function crearSemaforo(){
     }
     botones += '</div>';
 
-    var css = '.contenedor-botones {width: 240px;height: 40px;position: absolute;top: 20px;left: 60%;transform: translate(-50%, -50%);margin: auto;filter: url("#goo");animation: rotate-move 2s forwards;}';
+    var css = '.contenedor-botones {width: 240px;height: 40px;position: absolute;top: 20px;left: 65%;transform: translate(-50%, -50%);margin: auto;filter: url("#goo");animation: rotate-move 2s forwards;}';
     css += '.boton { width: 30px;height: 30px;border-radius: 50%;background-color: #000;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;padding:0 !important; color: transparent;font-weight: bold;-webkit-font-smoothing: antialiased;font-family: Arial, sans-serif;font-size: 14px;text-align: center;overflow: hidden;white-space: pre;}';
     css += '.boton:hover {filter: brightness(120%);cursor: pointer;}';
     css += '.boton-todos {background-color: #3572b0;animation: boton-1-move 2s forwards;}';
@@ -109,12 +136,18 @@ function crearSemaforo(){
     css += '.boton-alta:hover, .boton-alta:focus, .boton-alta:active {background-color: rgb(234, 68, 68) !important;}';
     css += '.boton-bloqueante {background-color: rgb(206, 0, 0);animation: boton-6-move 2s forwards;}';
     css += '.boton-bloqueante:hover, .boton-bloqueante:focus, .boton-bloqueante:active {background-color: rgb(206, 0, 0) !important;}';
+    css += '.boton-revision {background-color: rgb(99, 0, 230);animation: boton-7-move 2s forwards;}';
+    css += '.boton-revision:hover, .boton-bloqueante:focus, .boton-bloqueante:active {background-color: rgb(60, 0, 150) !important;}';
+    css += '.boton-pruebas {background-color: rgb(200, 0, 200);animation: boton-8-move 2s forwards;}';
+    css += '.boton-pruebas:hover, .boton-bloqueante:focus, .boton-bloqueante:active {background-color: rgb(160, 0, 160) !important;}';
     css += '@keyframes boton-1-move {0% {} 5% {} 80% {transform: translate(40px, 0px);}93% {transform: translate(100px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}100% {transform: translate(100px, 0px); width: 66px; height: 14px; padding: 8px; color: white; border-radius:0; border-top-right-radius: 3px; border-bottom-right-radius: 3px;}}';
     css += '@keyframes boton-2-move {0% {} 5% {} 80% {transform: translate(20px, 0px);}93% {transform: translate(40px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}98% {transform: translate(40px, 0px); width: 32px; height: 22px; padding: 8px; color: white; border-radius:0;}100% {transform: translate(40px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0;}}';
     css += '@keyframes boton-3-move {0% {} 5% {} 80% {transform: translate(0px, 0px); }93% {transform: translate(0px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}96% {transform: translate(0px, 0px); width: 32px; height: 22px; padding: 8px; color: white; border-radius:0;}100% {transform: translate(0px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0;}98% {transform: translate(0px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0;}}';
     css += '@keyframes boton-4-move {0% {} 5% {} 80% {transform: translate(-20px, 0px);}93% {transform: translate(-40px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}94% {transform: translate(-40px, 0px); width: 32px; height: 22px; padding: 8px; color: white; border-radius:0;}96% {transform: translate(-40px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0;}100% {transform: translate(-40px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0;}}';
     css += '@keyframes boton-5-move {0% {} 5% {} 80% {transform: translate(-40px, 0px);}93% {transform: translate(-80px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}96% {transform: translate(-80px, 0px); width: 32px; height: 22px; padding: 8px; color: white; border-radius:0;}98% {transform: translate(-80px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0;}100% {transform: translate(-80px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0;}}';
     css += '@keyframes boton-6-move {0% {} 5% {} 80% {transform: translate(-60px, 0px);}93% {transform: translate(-120px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}98% {transform: translate(-120px, 0px); width: 32px; height: 22px; padding: 8px; color: white; border-radius:0; border-top-left-radius: 3px; border-bottom-left-radius: 3px;}100% {transform: translate(-120px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0; border-top-left-radius: 3px; border-bottom-left-radius: 3px;}}';
+    css += '@keyframes boton-7-move {0% {} 5% {} 80% {transform: translate(-90px, 0px);}93% {transform: translate(-180px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}98% {transform: translate(-180px, 0px); width: 32px; height: 22px; padding: 8px; color: white; border-radius:0; border-top-left-radius: 3px; border-bottom-left-radius: 3px;}100% {transform: translate(-180px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0; border-top-right-radius: 3px; border-bottom-right-radius: 3px;}}';
+    css += '@keyframes boton-8-move {0% {} 5% {} 80% {transform: translate(-110px, 0px);}93% {transform: translate(-220px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}98% {transform: translate(-220px, 0px); width: 32px; height: 22px; padding: 8px; color: white; border-radius:0; border-top-left-radius: 3px; border-bottom-left-radius: 3px;}100% {transform: translate(-220px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0; border-top-left-radius: 3px; border-bottom-left-radius: 3px;}}';
     css += '@keyframes rotate-move {0% {filter: url("#goo")}40% {filter: url("#goo")}75% {filter: url("#goo2")}80% {filter: url("#goo3")}90% {filter: url("#goo4")}93% {filter: url("#goo5")}98% {filter: none}100% {filter: none}}';
 
     var svg = '<svg style="display:none" class="filtros-svg" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" version="1.1"><defs><filter id="goo"><feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" /><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 21 -7"/></filter><filter id="goo2"><feGaussianBlur in="SourceGraphic" stdDeviation="9" result="blur" /><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -7"/></filter><filter id="goo3"><feGaussianBlur in="SourceGraphic" stdDeviation="7.5" result="blur" /><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 21 -7"/></filter><filter id="goo4"><feGaussianBlur in="SourceGraphic" stdDeviation="6.5" result="blur" /><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 21 -7"/></filter><filter id="goo5"><feGaussianBlur in="SourceGraphic" stdDeviation="6.4" result="blur" /><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 40 -7"/></filter></defs></svg>';
