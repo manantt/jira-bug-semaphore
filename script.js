@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Jira bug semaphore
 // @namespace    http://tampermonkey.net/
-// @version      0.13
+// @version      0.14
 // @description  Displays bugs count by colors according to priority
 // @author       Manantt
 // @match        http://intranet.jira.es/*
@@ -21,7 +21,7 @@ var tickets = {
         "title":"En revisión",
         "color" : "rgb(50, 0, 0)",
         "borde" : "rgb(25, 0, 0)",
-        "ruta" : 'http://intranet.jira.es/issues/?jql=status%20%3D%20"En%20revision"%20%20ORDER%20BY%20priority%20DESC%2C%20created%20ASC'
+        "ruta" : "http://intranet.jira.es/issues/?jql=status%20%3D%20\'En%20revision\'%20%20ORDER%20BY%20priority%20DESC%2C%20created%20ASC"
     },
     "bloqueante" : {
         "cantidad" : 0,
