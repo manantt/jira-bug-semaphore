@@ -23,6 +23,13 @@ var tickets = {
         "borde" : "rgb(25, 0, 0)",
         "ruta" : "http://intranet.jira.es/issues/?jql=status%20%3D%20\'En%20revision\'%20%20ORDER%20BY%20priority%20DESC%2C%20created%20ASC"
     },
+    "pullrequest" : {
+        "cantidad" : 0,
+        "title":"Pull request",
+        "color" : "rgb(50, 50, 0)",
+        "borde" : "rgb(25, 25, 0)",
+        "ruta" : "http://intranet.jira.es/issues/?jql=status%20%3D%20\'Pull%20request\'%20%20ORDER%20BY%20priority%20DESC%2C%20created%20ASC"
+    },
     "bloqueante" : {
         "cantidad" : 0,
         "title":"Bloqueantes",
@@ -76,6 +83,13 @@ $.post( tickets['revision']['ruta'], function( data ) {
         cantidad = $(data).find("ol.issue-list li").length == "50" ? "50+" : $(data).find("ol.issue-list li").length;
     }
     $(".boton-revision").html(cantidad);
+});
+$.post( tickets['pullrequest']['ruta'], function( data ) {
+    var cantidad = data.match(/(total&quot;:)(\d)+(,&quot;)/g)[0].replace("total&quot;:", "").replace(",&quot;", "");
+    if(typeof cantidad == "undefined"){
+        cantidad = $(data).find("ol.issue-list li").length == "50" ? "50+" : $(data).find("ol.issue-list li").length;
+    }
+    $(".boton-pullrequest").html(cantidad);
 });
 $.post( tickets['bloqueante']['ruta'], function( data ) {
     var cantidad = data.match(/(total&quot;:)(\d)+(,&quot;)/g)[0].replace("total&quot;:", "").replace(",&quot;", "");
@@ -140,6 +154,8 @@ function crearSemaforo(){
     css += '.boton-revision:hover, .boton-bloqueante:focus, .boton-bloqueante:active {background-color: rgb(60, 0, 150) !important;}';
     css += '.boton-pruebas {background-color: rgb(200, 0, 200);animation: boton-8-move 2s forwards;}';
     css += '.boton-pruebas:hover, .boton-bloqueante:focus, .boton-bloqueante:active {background-color: rgb(160, 0, 160) !important;}';
+    css += '.boton-pullrequest {background-color: rgb(200, 200, 0);animation: boton-9-move 2s forwards;}';
+    css += '.boton-pullrequest:hover, .boton-bloqueante:focus, .boton-bloqueante:active {background-color: rgb(160, 160, 0) !important;}';
     css += '@keyframes boton-1-move {0% {} 5% {} 80% {transform: translate(40px, 0px);}93% {transform: translate(100px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}100% {transform: translate(100px, 0px); width: 66px; height: 14px; padding: 8px; color: white; border-radius:0; border-top-right-radius: 3px; border-bottom-right-radius: 3px;}}';
     css += '@keyframes boton-2-move {0% {} 5% {} 80% {transform: translate(20px, 0px);}93% {transform: translate(40px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}98% {transform: translate(40px, 0px); width: 32px; height: 22px; padding: 8px; color: white; border-radius:0;}100% {transform: translate(40px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0;}}';
     css += '@keyframes boton-3-move {0% {} 5% {} 80% {transform: translate(0px, 0px); }93% {transform: translate(0px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}96% {transform: translate(0px, 0px); width: 32px; height: 22px; padding: 8px; color: white; border-radius:0;}100% {transform: translate(0px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0;}98% {transform: translate(0px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0;}}';
@@ -147,7 +163,8 @@ function crearSemaforo(){
     css += '@keyframes boton-5-move {0% {} 5% {} 80% {transform: translate(-40px, 0px);}93% {transform: translate(-80px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}96% {transform: translate(-80px, 0px); width: 32px; height: 22px; padding: 8px; color: white; border-radius:0;}98% {transform: translate(-80px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0;}100% {transform: translate(-80px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0;}}';
     css += '@keyframes boton-6-move {0% {} 5% {} 80% {transform: translate(-60px, 0px);}93% {transform: translate(-120px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}98% {transform: translate(-120px, 0px); width: 32px; height: 22px; padding: 8px; color: white; border-radius:0; border-top-left-radius: 3px; border-bottom-left-radius: 3px;}100% {transform: translate(-120px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0; border-top-left-radius: 3px; border-bottom-left-radius: 3px;}}';
     css += '@keyframes boton-7-move {0% {} 5% {} 80% {transform: translate(-90px, 0px);}93% {transform: translate(-180px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}98% {transform: translate(-180px, 0px); width: 32px; height: 22px; padding: 8px; color: white; border-radius:0; border-top-left-radius: 3px; border-bottom-left-radius: 3px;}100% {transform: translate(-180px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0; border-top-right-radius: 3px; border-bottom-right-radius: 3px;}}';
-    css += '@keyframes boton-8-move {0% {} 5% {} 80% {transform: translate(-110px, 0px);}93% {transform: translate(-220px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}98% {transform: translate(-220px, 0px); width: 32px; height: 22px; padding: 8px; color: white; border-radius:0; border-top-left-radius: 3px; border-bottom-left-radius: 3px;}100% {transform: translate(-220px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0; border-top-left-radius: 3px; border-bottom-left-radius: 3px;}}';
+    css += '@keyframes boton-8-move {0% {} 5% {} 80% {transform: translate(-110px, 0px);}93% {transform: translate(-220px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}98% {transform: translate(-220px, 0px); width: 32px; height: 22px; padding: 8px; color: white; border-radius:0; }100% {transform: translate(-220px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0;}}';
+    css += '@keyframes boton-9-move {0% {} 5% {} 80% {transform: translate(-130px, 0px);}93% {transform: translate(-260px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}98% {transform: translate(-260px, 0px); width: 32px; height: 22px; padding: 8px; color: white; border-radius:0; border-top-left-radius: 3px; border-bottom-left-radius: 3px;}100% {transform: translate(-260px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0; border-top-left-radius: 3px; border-bottom-left-radius: 3px;}}';
     css += '@keyframes rotate-move {0% {filter: url("#goo")}40% {filter: url("#goo")}75% {filter: url("#goo2")}80% {filter: url("#goo3")}90% {filter: url("#goo4")}93% {filter: url("#goo5")}98% {filter: none}100% {filter: none}}';
 
     var svg = '<svg style="display:none" class="filtros-svg" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" version="1.1"><defs><filter id="goo"><feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" /><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 21 -7"/></filter><filter id="goo2"><feGaussianBlur in="SourceGraphic" stdDeviation="9" result="blur" /><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -7"/></filter><filter id="goo3"><feGaussianBlur in="SourceGraphic" stdDeviation="7.5" result="blur" /><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 21 -7"/></filter><filter id="goo4"><feGaussianBlur in="SourceGraphic" stdDeviation="6.5" result="blur" /><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 21 -7"/></filter><filter id="goo5"><feGaussianBlur in="SourceGraphic" stdDeviation="6.4" result="blur" /><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 40 -7"/></filter></defs></svg>';
