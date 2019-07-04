@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         Jira bug semaphore
 // @namespace    http://tampermonkey.net/
-// @version      0.17
+// @version      0.18
 // @description  Displays bugs count by colors according to priority
 // @author       Manantt
 // @match        http://intranet.jira.es/*
 // @grant        none
 // ==/UserScript==
-
+var rutaReabiertosPropios = 'http://intranet.jira.es/issues/?jql=status%20%3D%20Reopened%20and%20assignee%20%3D%20currentUser()%20ORDER%20BY%20priority%20DESC%2C%20created%20ASC';
 var tickets = {
     "pruebas" : {
         "cantidad" : 0,
@@ -64,6 +64,20 @@ var tickets = {
         "color" : "rgb(85, 165, 87)",
         "borde" : "rgb(55, 107, 56)",
         "ruta" : "http://intranet.jira.es/issues/?jql=project%20%3D%20NeT10-Bugs%20AND%20priority%20in%20(\'Muy%20baja\')%20AND%20statusCategory%20in%20(%22To%20Do%22%2C%20%22In%20Progress%22)%20AND%20type%20%3D%20Error%20ORDER%20BY%20priority%20DESC%2C%20created%20ASC"
+    },
+    "reabierto" : {
+        "cantidad" : 0,
+        "title":"Reabierto",
+        "color" : "rgb(165, 165, 165)",
+        "borde" : "rgb(107, 107, 107)",
+        "ruta" : "http://intranet.jira.es/issues/?jql=status%20%3D%20Reopened%20ORDER%20BY%20priority%20DESC%2C%20created%20ASC"
+    },
+    "confexterna" : {
+        "cantidad" : 0,
+        "title":"Confirmación externa",
+        "color" : "rgb(85, 165, 87)",
+        "borde" : "rgb(55, 107, 56)",
+        "ruta" : "http://intranet.jira.es/issues/?jql=status%20%3D%20'Confirmación%20externa'%20%20%20ORDER%20BY%20priority%20DESC%2C%20created%20ASC"
     },
 };
 (function() {
@@ -126,6 +140,28 @@ $.post( tickets['muybaja']['ruta'], function( data ) {
     }
     $(".boton-muybaja").html(cantidad);
 });
+$.post( tickets['reabierto']['ruta'], function( data ) {
+    var cantidad = data.match(/(total&quot;:)(\d)+(,&quot;)/g)[0].replace("total&quot;:", "").replace(",&quot;", "");
+    if(typeof cantidad == "undefined"){
+        cantidad = $(data).find("ol.issue-list li").length == "50" ? "50+" : $(data).find("ol.issue-list li").length;
+    }
+    $(".boton-reabierto").html(cantidad);
+});
+$.post( tickets['confexterna']['ruta'], function( data ) {
+    var cantidad = data.match(/(total&quot;:)(\d)+(,&quot;)/g)[0].replace("total&quot;:", "").replace(",&quot;", "");
+    if(typeof cantidad == "undefined"){
+        cantidad = $(data).find("ol.issue-list li").length == "50" ? "50+" : $(data).find("ol.issue-list li").length;
+    }
+    $(".boton-confexterna").html(cantidad);
+});
+$.post( rutaReabiertosPropios, function( data ) {
+    var cantidad = data.match(/(total&quot;:)(\d)+(,&quot;)/g)[0].replace("total&quot;:", "").replace(",&quot;", "");
+    if(typeof cantidad != "undefined" && parseInt(cantidad) > 0){
+        cantidad = "";
+        cantidad = "<span class='reabierto'>⚠</span>";
+        $(".boton-reabierto").html(cantidad);
+    }
+});
 //
 function crearSemaforo(){
     var botones = '<div class="contenedor-botones">';
@@ -135,11 +171,15 @@ function crearSemaforo(){
     }
     botones += '</div>';
 
-    var css = '.contenedor-botones {width: 240px;height: 40px;position: absolute;top: 20px;left: 65%;transform: translate(-50%, -50%);margin: auto;filter: url("#goo");animation: rotate-move 2s forwards;}';
+    var css = '.contenedor-botones {width: 240px;height: 40px;position: absolute;top: 20px;left: 65%;transform: translate(-50%, -50%);margin: auto;filter: url("#goo");animation: rotate-move 2s forwards;}span.reabierto{color:rgb(204, 20, 20);position:relative;top:-5px;font-size:27px}';
     css += '.boton { width: 30px;height: 30px;border-radius: 50%;background-color: #000;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;padding:0 !important; color: transparent;font-weight: bold;-webkit-font-smoothing: antialiased;font-family: Arial, sans-serif;font-size: 14px;text-align: center;overflow: hidden;white-space: pre;}';
     css += '.boton:hover {filter: brightness(120%);cursor: pointer;}';
     css += '.boton-todos {background-color: #3572b0;animation: boton-1-move 2s forwards;}';
     css += '.boton-todos:hover, .boton-todos:focus, .boton-todos:active {background-color: #3572b0 !important;}';
+    css += '.boton-reabierto {background-color: rgb(165, 165, 165);animation: boton-10-move 2s forwards;}';
+    css += '.boton-reabierto:hover, .boton-reabierto:focus, .boton-reabierto:active {background-color: rgb(165, 165, 165) !important;}';
+    css += '.boton-confexterna {background-color: rgb(85, 85, 85);animation: boton-11-move 2s forwards;}';
+    css += '.boton-confexterna:hover, .boton-confexterna:focus, .boton-confexterna:active {background-color: rgb(85, 85, 85) !important;}';
     css += '.boton-muybaja {background-color: rgb(85, 165, 87);animation: boton-2-move 2s forwards;}';
     css += '.boton-muybaja:hover, .boton-muybaja:focus, .boton-muybaja:active {background-color: rgb(85, 165, 87) !important;}';
     css += '.boton-baja {background-color: rgb(42, 135, 53);animation: boton-3-move 2s forwards;}';
@@ -165,6 +205,8 @@ function crearSemaforo(){
     css += '@keyframes boton-7-move {0% {} 5% {} 80% {transform: translate(-90px, 0px);}93% {transform: translate(-180px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}98% {transform: translate(-180px, 0px); width: 32px; height: 22px; padding: 8px; color: white; border-radius:0; border-top-left-radius: 3px; border-bottom-left-radius: 3px;}100% {transform: translate(-180px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0; border-top-right-radius: 3px; border-bottom-right-radius: 3px;}}';
     css += '@keyframes boton-8-move {0% {} 5% {} 80% {transform: translate(-110px, 0px);}93% {transform: translate(-220px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}98% {transform: translate(-220px, 0px); width: 32px; height: 22px; padding: 8px; color: white; border-radius:0; }100% {transform: translate(-220px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0;}}';
     css += '@keyframes boton-9-move {0% {} 5% {} 80% {transform: translate(-130px, 0px);}93% {transform: translate(-260px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}98% {transform: translate(-260px, 0px); width: 32px; height: 22px; padding: 8px; color: white; border-radius:0; border-top-left-radius: 3px; border-bottom-left-radius: 3px;}100% {transform: translate(-260px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0; border-top-left-radius: 3px; border-bottom-left-radius: 3px;}}';
+    css += '@keyframes boton-10-move {0% {} 5% {} 80% {transform: translate(90px, 0px);}93% {transform: translate(180px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}98% {transform: translate(180px, 0px); width: 32px; height: 22px; padding: 8px; color: white; border-radius:0;}100% {transform: translate(180px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0;border-top-left-radius: 3px; border-bottom-left-radius: 3px;}}';
+    css += '@keyframes boton-11-move {0% {} 5% {} 80% {transform: translate(110px, 0px);}93% {transform: translate(220px, 0px); width: 30px; height: 30px; padding: 0; color:transparent; border-radius:50%}98% {transform: translate(220px, 0px); width: 32px; height: 22px; padding: 8px; color: white; border-radius:0;}100% {transform: translate(220px, 0px); width: 24px; height: 14px; padding: 8px; color: white; border-radius:0;border-top-right-radius: 3px; border-bottom-right-radius: 3px;}}';
     css += '@keyframes rotate-move {0% {filter: url("#goo")}40% {filter: url("#goo")}75% {filter: url("#goo2")}80% {filter: url("#goo3")}90% {filter: url("#goo4")}93% {filter: url("#goo5")}98% {filter: none}100% {filter: none}}';
 
     var svg = '<svg style="display:none" class="filtros-svg" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" version="1.1"><defs><filter id="goo"><feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" /><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 21 -7"/></filter><filter id="goo2"><feGaussianBlur in="SourceGraphic" stdDeviation="9" result="blur" /><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -7"/></filter><filter id="goo3"><feGaussianBlur in="SourceGraphic" stdDeviation="7.5" result="blur" /><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 21 -7"/></filter><filter id="goo4"><feGaussianBlur in="SourceGraphic" stdDeviation="6.5" result="blur" /><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 21 -7"/></filter><filter id="goo5"><feGaussianBlur in="SourceGraphic" stdDeviation="6.4" result="blur" /><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 40 -7"/></filter></defs></svg>';
