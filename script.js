@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Jira bug semaphore
 // @namespace    http://tampermonkey.net/
-// @version      0.20
+// @version      0.21
 // @description  Displays bugs count by colors according to priority
 // @author       Manantt
 // @match        http://intranet.jira.es/*
