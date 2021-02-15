@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Jira bug semaphore
 // @namespace    http://tampermonkey.net/
-// @version      0.21
+// @version      0.22
 // @description  Displays bugs count by colors according to priority
 // @author       Manantt
 // @match        http://intranet.jira.es/*
@@ -14,7 +14,7 @@ var tickets = {
         "title":"En pruebas",
         "color" : "rgb(100, 0, 0)",
         "borde" : "rgb(25, 0, 0)",
-        "ruta" : 'http://intranet.jira.es/issues/?jql=status%20%3D%20Pruebas%20%20ORDER%20BY%20priority%20DESC%2C%20created%20ASC'
+        "ruta" : 'http://intranet.jira.es/issues/?jql=status%20%3D%20Pruebas%20OR%20status%20%3D%20Probando%20%20ORDER%20BY%20priority%20DESC%2C%20created%20ASC'
     },
     "revision" : {
         "cantidad" : 0,
@@ -135,6 +135,8 @@ $.post( tickets['bloqueante']['ruta'], function( data ) {
     if(cantidad > 0){
         $(".bugs .alerta").attr("class", "alertando");
     }
+    $(".contenedor.bugs").attr("data-tickets", $(data).find("#issuetable").html());
+    $("#panel-tickets-table").html($(data).find("#issuetable").html());
 });
 $.post( tickets['alta']['ruta'], function( data ) {
     var cantidad = data.match(/(total&quot;:)(\d)+(,&quot;)/g)[0].replace("total&quot;:", "").replace(",&quot;", "");
@@ -284,6 +286,9 @@ function crearDashboard(){
     }
     botones += '<div id="opciones" title="Opciones"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="cog" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-cog fa-w-16 fa-2x"><path fill="#555" d="M487.4 315.7l-42.6-24.6c4.3-23.2 4.3-47 0-70.2l42.6-24.6c4.9-2.8 7.1-8.6 5.5-14-11.1-35.6-30-67.8-54.7-94.6-3.8-4.1-10-5.1-14.8-2.3L380.8 110c-17.9-15.4-38.5-27.3-60.8-35.1V25.8c0-5.6-3.9-10.5-9.4-11.7-36.7-8.2-74.3-7.8-109.2 0-5.5 1.2-9.4 6.1-9.4 11.7V75c-22.2 7.9-42.8 19.8-60.8 35.1L88.7 85.5c-4.9-2.8-11-1.9-14.8 2.3-24.7 26.7-43.6 58.9-54.7 94.6-1.7 5.4.6 11.2 5.5 14L67.3 221c-4.3 23.2-4.3 47 0 70.2l-42.6 24.6c-4.9 2.8-7.1 8.6-5.5 14 11.1 35.6 30 67.8 54.7 94.6 3.8 4.1 10 5.1 14.8 2.3l42.6-24.6c17.9 15.4 38.5 27.3 60.8 35.1v49.2c0 5.6 3.9 10.5 9.4 11.7 36.7 8.2 74.3 7.8 109.2 0 5.5-1.2 9.4-6.1 9.4-11.7v-49.2c22.2-7.9 42.8-19.8 60.8-35.1l42.6 24.6c4.9 2.8 11 1.9 14.8-2.3 24.7-26.7 43.6-58.9 54.7-94.6 1.5-5.5-.7-11.3-5.6-14.1zM256 336c-44.1 0-80-35.9-80-80s35.9-80 80-80 80 35.9 80 80-35.9 80-80 80z" class=""></path></svg></div>';
     botones += '</div>';
+    botones += '<div id="panel-tickets">';
+    botones += '<h1 id="panel-ticket-titulo">Título demo</h1><table id="panel-tickets-table"></table>';
+    botones += '</div>';
     botones += '</div>';
 
     botones += '<div id="myModal" class="modal"><div class="modal-content"><span class="close">&times;</span>';
@@ -298,14 +303,14 @@ function crearDashboard(){
 
 
     var css = '.contenedor-dash {width: '+(ancho+32)+'px;height: 30px;position: absolute;top: 41px;right: 15px;}';
-    css += '#abrir {width: 30px;height: 28px;position: absolute;top: 0;left: 0;background:#f5f5f5;border:1px solid #ccc;border-bottom-left-radius: 3px;cursor:pointer;border-top:none}';
+    css += '#abrir {z-index:1;width: 30px;height: 28px;position: absolute;top: 0;left: 0;background:#f5f5f5;border:1px solid #ccc;border-bottom-left-radius: 3px;cursor:pointer;border-top:none}';
     css += '#abrir svg {position: relative;top:4px;left:7px}';
-    css += '.contenedor-dashboard {width: '+ancho+'px;height: 28px;position: absolute;top: 0;left: 32px;background:#f5f5f5;border:1px solid #ccc;border-left: none;border-top:none;border-right:none}';
-    css += '.contenedor {width:20px;height:28px;display:inline-block; margin:4px 6px}';
+    css += '.contenedor-dashboard {z-index:1;width: '+ancho+'px;height: 28px;position: absolute;top: 0;left: 32px;background:#f5f5f5;border:1px solid #ccc;border-left: none;border-top:none;border-right:none}';
+    css += '.contenedor {z-index:1;width:20px;height:28px;display:inline-block; margin:4px 6px}';
     css += '#opciones {width:15px;height:15px;display:inline-block; margin:4px 6px; float:right;cursor:pointer}';
     css += '.alertando{animation: alerta .5s forwards}';
     css += '@keyframes alerta {from {fill: #555;}to {fill: #dc3545;}}';
-    css += '.num {position: absolute;height: 8px;background: #fafafa;padding: 0;margin: 0;top: 29px;text-align: center;border-bottom-left-radius: 5px;border-bottom-right-radius: 5px;border: 1px solid #eee;border-top:none}';
+    css += '.num {z-index:1;position: absolute;height: 8px;background: #fafafa;padding: 0;margin: 0;top: 29px;text-align: center;border-bottom-left-radius: 5px;border-bottom-right-radius: 5px;border: 1px solid #ccc;border-top:none}';
     css += '.num span {color: #777;font-size: 8px;top: -8px;position: relative;}';
     css += '.num.bugs{left: -1px;width: 31px;}';
     css += '.num.propios{left: 31px;width:30px}';
@@ -313,6 +318,8 @@ function crearDashboard(){
     css += '.num.rev{left: 94px;width:32px}';
     css += '.num.pruebas{left: 126px;width:32px}';
     css += '.num.pull{left: 158px;width:32px}';
+    css += '#panel-tickets{display:none;padding: 15px 10px;position: absolute;width: 100%;top: 28px;background: #fafafa;border: 1px solid #ccc;border-top:none;overflow:hidden}';
+    css += '#panel-tickets-titulo{font-size:18px}';
 
     css += '/* The Modal (background) */.modal {  display: none; /* Hidden by default */  position: fixed; /* Stay in place */  z-index: 1; /* Sit on top */  left: 0;  top: 0;  width: 100%; /* Full width */  height: 100%; /* Full height */  overflow: auto; /* Enable scroll if needed */  background-color: rgb(0,0,0); /* Fallback color */  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */}/* Modal Content/Box */.modal-content {  background-color: #fefefe;  margin: 15% auto; /* 15% from the top and centered */  padding: 20px;  border: 1px solid #888;  width: 80%; /* Could be more or less, depending on screen size */}/* The Close Button */.close {  color: #aaa;  float: right;  font-size: 28px;  font-weight: bold;}.close:hover,.close:focus {color: black;text-decoration: none;cursor: pointer;}';
 
@@ -392,6 +399,10 @@ function crearDashboard(){
     document.getElementById("abrir").onclick = function(){
         document.getElementById("contenedor-botones").style.display = "block";
     };
+    //
+    $(".contenedor-dashboard").click(function() {
+    	//$("#panel-tickets").slideToggle();
+    });
 }
 
 function getUser(){
