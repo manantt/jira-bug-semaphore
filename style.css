@@ -1,0 +1,142 @@
+.contenedor-dash {
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 41px;
+    right: 14px;
+    z-index: 999;
+}
+
+#semaforo {
+    overflow: hidden;
+    position: absolute;
+    width: 180px;
+    left: -180px;
+    display: flex;
+    transition: .5s;
+}
+
+#semaforo.cerrado {
+    width: 0px;
+    left: 0;
+}
+
+.item-semaforo {
+    height: 30px;
+    display: inline-block;
+    background: red;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    text-align: center;
+    white-space: pre;
+    color: #fff;
+    cursor: pointer;
+}
+
+.item-semaforo:first-child {
+    border-bottom-left-radius: 5px;
+}
+
+
+.item-semaforo:hover, .item-semaforo:focus {
+    filter: brightness(120%);
+    color: #fff;
+    text-decoration: none;
+}
+
+.item-semaforo-bloqueante {
+    left: -180px;
+    background-color: rgb(50, 40, 40);
+}
+
+.item-semaforo-muyalta {
+    left: -150px;
+    background-color: rgb(206, 0, 0);
+}
+
+.item-semaforo-alta {
+    left: -120px;
+    background-color: rgb(234, 68, 68);
+}
+
+.item-semaforo-media {
+    left: -90px;
+    background-color: rgb(234, 125, 36);
+}
+
+.item-semaforo-baja {
+    left: -60px;
+    background-color: rgb(42, 135, 53);
+}
+
+.item-semaforo-muybaja {
+    left: -30px;
+    background-color: rgb(85, 165, 87);
+}
+
+#abrir {
+    z-index: 1;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #f5f5f5;
+    border: 1px solid #ccc;
+    border-top: none;
+    cursor: pointer;
+}
+
+#abrir svg {
+    position: relative;
+    top: 4px;
+    left: 7px
+}
+
+.contenedor-dashboard {
+    z-index: 1;
+    width: 30px;
+    position: absolute;
+    top: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    overflow: hidden;
+}
+
+.contenedor-dashboard.cerrado .contenedor {
+    height: 0px;
+    padding: 0;
+    overflow: hidden;
+    border: none;
+    width: 30px;
+}
+
+.contenedor {
+    border: 1px solid #ccc;
+    z-index: 1;
+    width: 30px;
+    height: 30px;
+    padding: 5px;
+    border-top: none;
+    background: #f5f5f5;
+    transition: .5s;
+    cursor: pointer;
+    color: #777;
+    text-align: center;
+}
+
+.pruebas, .propios {
+    margin-top: 10px;
+    border-top: 1px solid #ccc;
+}
+
+.contenedor:hover {
+    filter: brightness(80%);
+    color: #999;
+    text-decoration: none;
+}
