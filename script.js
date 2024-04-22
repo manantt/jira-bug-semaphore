@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Jira bug semaphore
 // @namespace    http://tampermonkey.net/
-// @version      1.0.1
+// @version      1.0.2
 // @description  Displays bugs count by colors according to priority
 // @author       Manantt
 // @match        http://intranet.jira.es/*
@@ -186,7 +186,7 @@ function crearDashboard(){
     botones += '</div>';
     botones += '</div>';
 
-    $("body").append(botones);
+    $("body#jira").append(botones);
     if(cerrado) {
         $(".contenedor-dashboard").addClass("cerrado");
         $("#semaforo").addClass("cerrado");
