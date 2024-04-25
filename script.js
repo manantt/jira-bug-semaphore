@@ -8,7 +8,7 @@
 // @require      http://code.jquery.com/jquery-3.3.1.js
 // @require      https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js
 // @resource     bootstrapCSS https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css
-// @resource     style https://raw.githubusercontent.com/manantt/jira-bug-semaphore/master/style.css
+// @resource     style https://raw.githubusercontent.com/manantt/jira-bug-semaphore/master/style2.css
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // ==/UserScript==
